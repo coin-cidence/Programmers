@@ -1,0 +1,20 @@
+SELECT P.MEMBER_NAME, R.REVIEW_TEXT, TO_CHAR(R.REVIEW_DATE,'YYYY-MM-DD') AS REVIEW_DATE
+  FROM MEMBER_PROFILE P,REST_REVIEW R
+ WHERE P.MEMBER_ID=R.MEMBER_ID
+   AND R.MEMBER_ID IN
+    (
+        SELECT MEMBER_ID
+          FROM (
+                SELECT R.MEMBER_ID, COUNT(R.MEMBER_ID) AS COUNT
+                  FROM REST_REVIEW R
+                 GROUP BY R.MEMBER_ID
+                 ORDER BY COUNT(R.MEMBER_ID) DESC )
+         WHERE COUNT=
+                 ( SELECT MAX(COUNT)
+                     FROM (
+                         SELECT R.MEMBER_ID, COUNT(R.MEMBER_ID) AS COUNT
+                           FROM REST_REVIEW R
+                          GROUP BY R.MEMBER_ID
+                          ORDER BY COUNT(R.MEMBER_ID) DESC ))
+     )
+ ORDER BY R.REVIEW_DATE, REVIEW_TEXT
